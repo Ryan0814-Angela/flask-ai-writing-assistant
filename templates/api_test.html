@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI API 測試工具</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(to right, #f5f7fa, #c3cfe2);
+        }
+
+        .return-home-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background-color: #17a2b8;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 8px 16px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s;
+            text-decoration: none;
+        }
+
+        .return-home-btn:hover {
+            background-color: #138496;
+            color: white;
+        }
+    </style>
+</head>
+<body class="container mt-4">
+
+    <!-- 返回首頁按鈕 -->
+    <a href="/" class="return-home-btn">🏠 返回首頁</a>
+
+    <h1 class="text-center text-primary mb-4">AI API 測試工具</h1>
+
+    <!-- ChatGPT -->
+    <div class="card p-3 mb-4">
+        <h3 class="text-info">ChatGPT</h3>
+        <input type="text" id="chatgpt_prompt" class="form-control mb-2" placeholder="輸入 ChatGPT 提示詞">
+        <button class="btn btn-primary" onclick="sendChatGPT()">發送</button>
+        <pre id="chatgpt_response" class="bg-light p-3 mt-2 rounded"></pre>
+    </div>
+
+    <!-- Gemini -->
+    <div class="card p-3 mb-4">
+        <h3 class="text-success">Gemini</h3>
+        <input type="text" id="gemini_prompt" class="form-control mb-2" placeholder="輸入 Gemini 提示詞">
+        <button class="btn btn-success" onclick="sendGemini()">發送</button>
+        <pre id="gemini_response" class="bg-light p-3 mt-2 rounded"></pre>
+    </div>
+
+    <!-- API 測試 -->
+    <div class="card p-3 mb-4">
+        <h3 class="text-warning">API 測試</h3>
+
+        <label class="form-label">API URL:</label>
+        <input type="text" id="api_url" class="form-control" placeholder="輸入 API 連結">
+
+        <label class="form-label mt-2">請求方法:</label>
+        <select id="method" class="form-select">
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+        </select>
+
+        <label class="form-label mt-2">請求內容 (JSON):</label>
+        <textarea id="body" class="form-control" rows="4" placeholder='{"key": "value"}'></textarea>
+
+        <button class="btn btn-warning mt-2" onclick="sendRequest()">發送請求</button>
+
+        <div id="loading" class="text-center mt-2" style="display: none;">
+            <div class="spinner-border text-secondary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p>請稍候...</p>
+        </div>
+
+        <h5 class="mt-3">回應：</h5>
+        <pre id="response" class="bg-light p-3 rounded"></pre>
+    </div>
+
+    <!-- JS -->
+    <script>
+        function sendChatGPT() {
+            const prompt = document.getElementById("chatgpt_prompt").value;
+            fetch("/chatgpt", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ prompt })
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById("chatgpt_response").textContent = JSON.stringify(data, null, 2);
+            });
+        }
+
+        function sendGemini() {
+            const prompt = document.getElementById("gemini_prompt").value;
+            fetch("/gemini", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ prompt })
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById("gemini_response").textContent = JSON.stringify(data, null, 2);
+            });
+        }
+
+        function sendRequest() {
+            const apiUrl = document.getElementById("api_url").value;
+            const method = document.getElementById("method").value;
+            const body = document.getElementById("body").value;
+
+            const options = {
+                method,
+                headers: { "Content-Type": "application/json" }
+            };
+
+            if (method === "POST" && body.trim() !== "") {
+                options.body = body;
+            }
+
+            document.getElementById("loading").style.display = "block";
+
+            fetch("/proxy_request", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    api_url: apiUrl,
+                    method,
+                    headers: { "Content-Type": "application/json" },
+                    body: body ? JSON.parse(body) : null
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById("loading").style.display = "none";
+                document.getElementById("response").textContent = JSON.stringify(data, null, 2);
+            })
+            .catch(err => {
+                document.getElementById("loading").style.display = "none";
+                document.getElementById("response").textContent = "錯誤：" + err;
+            });
+        }
+    </script>
+
+</body>
+</html>
+
