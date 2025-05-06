@@ -56,35 +56,6 @@
         <pre id="gemini_response" class="bg-light p-3 mt-2 rounded"></pre>
     </div>
 
-    <!-- API 測試 -->
-    <div class="card p-3 mb-4">
-        <h3 class="text-warning">API 測試</h3>
-
-        <label class="form-label">API URL:</label>
-        <input type="text" id="api_url" class="form-control" placeholder="輸入 API 連結">
-
-        <label class="form-label mt-2">請求方法:</label>
-        <select id="method" class="form-select">
-            <option value="GET">GET</option>
-            <option value="POST">POST</option>
-        </select>
-
-        <label class="form-label mt-2">請求內容 (JSON):</label>
-        <textarea id="body" class="form-control" rows="4" placeholder='{"key": "value"}'></textarea>
-
-        <button class="btn btn-warning mt-2" onclick="sendRequest()">發送請求</button>
-
-        <div id="loading" class="text-center mt-2" style="display: none;">
-            <div class="spinner-border text-secondary" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            <p>請稍候...</p>
-        </div>
-
-        <h5 class="mt-3">回應：</h5>
-        <pre id="response" class="bg-light p-3 rounded"></pre>
-    </div>
-
     <!-- JS -->
     <script>
         function sendChatGPT() {
@@ -112,45 +83,9 @@
                 document.getElementById("gemini_response").textContent = JSON.stringify(data, null, 2);
             });
         }
-
-        function sendRequest() {
-            const apiUrl = document.getElementById("api_url").value;
-            const method = document.getElementById("method").value;
-            const body = document.getElementById("body").value;
-
-            const options = {
-                method,
-                headers: { "Content-Type": "application/json" }
-            };
-
-            if (method === "POST" && body.trim() !== "") {
-                options.body = body;
-            }
-
-            document.getElementById("loading").style.display = "block";
-
-            fetch("/proxy_request", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    api_url: apiUrl,
-                    method,
-                    headers: { "Content-Type": "application/json" },
-                    body: body ? JSON.parse(body) : null
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById("loading").style.display = "none";
-                document.getElementById("response").textContent = JSON.stringify(data, null, 2);
-            })
-            .catch(err => {
-                document.getElementById("loading").style.display = "none";
-                document.getElementById("response").textContent = "錯誤：" + err;
-            });
-        }
     </script>
 
 </body>
 </html>
+
 
