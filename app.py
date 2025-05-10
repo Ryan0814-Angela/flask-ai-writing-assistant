@@ -6,13 +6,19 @@ import sqlite3
 import os
 import hashlib
 import secrets
+from dotenv import load_dotenv
+
+load_dotenv() 
 
 app = Flask(__name__, static_folder="static")
 app.secret_key = 'your_secret_key_here'
 CORS(app)
 
-CHATGPT_API_KEY = "your_openai_api_key"
-GEMINI_API_KEY = "your_gemini_api_key"
+# ✅ 從環境變數讀取 API 金鑰
+CHATGPT_API_KEY = os.getenv("OPENAI_API_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+print("🔑 ChatGPT Key from env:", CHATGPT_API_KEY)
 
 logging.basicConfig(level=logging.INFO)
 
