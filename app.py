@@ -164,7 +164,7 @@ def proxy_request():
 def chatgpt():
     try:
         data = request.json
-        prompt = data.get("prompt", "")
+        prompt = data.get("prompt", "").strip()
 
         if not prompt:
             return jsonify({"error": "Please provide prompt"}), 400
@@ -175,7 +175,7 @@ def chatgpt():
         }
 
         payload = {
-            "model": "gpt-4",
+            "model": "gpt-3.5-turbo",
             "messages": [{"role": "user", "content": prompt}],
             "temperature": 0.7
         }
