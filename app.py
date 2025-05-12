@@ -19,6 +19,7 @@ CHATGPT_API_KEY = os.getenv("OPENAI_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 print("🔑 ChatGPT Key from env:", CHATGPT_API_KEY)
+print("🔑 Gemini Key from env:", GEMINI_API_KEY) 
 
 logging.basicConfig(level=logging.INFO)
 
