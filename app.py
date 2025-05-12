@@ -191,17 +191,19 @@ def chatgpt():
 def gemini():
     try:
         data = request.json
-        prompt = data.get("prompt", "")
+        prompt = data.get("prompt", "").strip()
 
         if not prompt:
             return jsonify({"error": "Please provide prompt"}), 400
 
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateText?key={GEMINI_API_KEY}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={GEMINI_API_KEY}"
 
         payload = {
-            "prompt": {
-                "text": prompt
-            }
+            "contents": [
+                {
+                    "parts": [{"text": prompt}]
+                }
+            ]
         }
 
         headers = {
@@ -214,6 +216,7 @@ def gemini():
     except Exception as e:
         logging.error(f"Gemini API error: {str(e)}")
         return jsonify({"error": str(e)}), 500
+
 
 
 @app.route('/status')
