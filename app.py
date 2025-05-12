@@ -196,11 +196,13 @@ def gemini():
         if not prompt:
             return jsonify({"error": "Please provide prompt"}), 400
 
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={GEMINI_API_KEY}"
+        # ✅ 使用正確的 API 版本 (v1) 和模型名稱
+        url = f"https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key={GEMINI_API_KEY}"
 
         payload = {
             "contents": [
                 {
+                    "role": "user",
                     "parts": [{"text": prompt}]
                 }
             ]
