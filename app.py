@@ -17,6 +17,7 @@ CORS(app)
 # ✅ 從環境變數讀取 API 金鑰
 CHATGPT_API_KEY = os.getenv("OPENAI_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+print("🔑 GEMINI_API_KEY loaded (head):", GEMINI_API_KEY[:4])
 
 print("🔑 ChatGPT Key from env:", CHATGPT_API_KEY)
 print("🔑 Gemini Key from env:", GEMINI_API_KEY) 
@@ -199,28 +200,32 @@ def gemini():
 
         url = f"https://generativelanguage.googleapis.com/v1beta1/models/gemini-pro:generateContent?key={GEMINI_API_KEY}"
 
-
         payload = {
-    "contents": [
-        {
-            "role": "user",
-            "parts": [{"text": prompt}]
+            "contents": [
+                {
+                    "role": "user",
+                    "parts": [{"text": prompt}]
+                }
+            ]
         }
-    ]
-}
-
 
         headers = {
             "Content-Type": "application/json"
         }
 
         response = requests.post(url, json=payload, headers=headers)
-        print("🔍 Gemini raw response:", response.text) 
+
+        # 這裡加上 print 確保你能看到回傳原始內容
+        print("🔍 Gemini raw response:", response.status_code, response.text)
+
+
+        # 若不是 JSON，會在這裡報錯
         return jsonify(response.json())
 
     except Exception as e:
         logging.error(f"Gemini API error: {str(e)}")
         return jsonify({"error": str(e)}), 500
+
 
 
 
