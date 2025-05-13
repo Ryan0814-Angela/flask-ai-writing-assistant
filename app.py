@@ -203,6 +203,7 @@ def gemini():
         payload = {
             "contents": [
                 {
+                    "role": "user",  # ← 這一行不能少
                     "parts": [{"text": prompt}]
                 }
             ]
@@ -225,6 +226,7 @@ def gemini():
     except Exception as e:
         logging.error(f"Gemini API error: {str(e)}")
         return jsonify({"error": str(e)}), 500
+
 
 
 @app.route('/status')
