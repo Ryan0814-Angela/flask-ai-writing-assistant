@@ -215,6 +215,7 @@ def gemini():
         }
 
         response = requests.post(url, json=payload, headers=headers)
+        print("🔍 Gemini raw response:", response.text) 
         return jsonify(response.json())
 
     except Exception as e:
