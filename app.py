@@ -200,6 +200,7 @@ def gemini():
 
         url = f"https://generativelanguage.googleapis.com/v1beta1/models/gemini-pro:generateContent?key={GEMINI_API_KEY}"
 
+
         payload = {
             "contents": [
                 {
@@ -223,10 +224,8 @@ def gemini():
         return jsonify(response.json())
 
     except Exception as e:
-        logging.error(f"Gemini API error: {str(e)}")
-        return jsonify({"error": str(e)}), 500
-
-
+        logging.error(f"JSON decode failed: {str(e)}")
+        return jsonify({"error": "Invalid JSON from Gemini API", "raw": response.text}), 500
 
 
 
