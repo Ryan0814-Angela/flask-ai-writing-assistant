@@ -200,11 +200,9 @@ def gemini():
 
         url = f"https://generativelanguage.googleapis.com/v1beta1/models/gemini-pro:generateContent?key={GEMINI_API_KEY}"
 
-
         payload = {
             "contents": [
                 {
-                    "role": "user",
                     "parts": [{"text": prompt}]
                 }
             ]
@@ -216,17 +214,17 @@ def gemini():
 
         response = requests.post(url, json=payload, headers=headers)
 
-        # 這裡加上 print 確保你能看到回傳原始內容
-        print("🔍 Gemini raw response:", response.status_code, response.text)
-
-
-        # 若不是 JSON，會在這裡報錯
-        return jsonify(response.json())
+        try:
+            return jsonify(response.json())
+        except ValueError:
+            return jsonify({
+                "error": "Invalid JSON from Gemini API",
+                "raw": response.text
+            }), 500
 
     except Exception as e:
-        logging.error(f"JSON decode failed: {str(e)}")
-        return jsonify({"error": "Invalid JSON from Gemini API", "raw": response.text}), 500
-
+        logging.error(f"Gemini API error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route('/status')
