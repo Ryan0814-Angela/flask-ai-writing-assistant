@@ -167,27 +167,51 @@ def chatgpt():
     try:
         data = request.json
         prompt = data.get("prompt", "").strip()
+        feature = data.get("feature", "").strip()
 
         if not prompt:
-            return jsonify({"error": "Please provide prompt"}), 400
+            return jsonify({"error": "Please provide a prompt"}), 400
 
+        # Feature-specific instructions
+        feature_prompts = {
+            "grammar": "Please check and correct the grammar in the following text:",
+            "style": "Rewrite the following in three different styles: academic, conversational, and business:",
+            "image": "Pretend this is an image description task. Describe the following imaginary scene:",
+            "inspiration": "Generate a paragraph of writing inspiration based on the following idea:",
+            "suggestion": "Suggest improvements and explain errors for the following sentence:"
+        }
+
+        full_prompt = feature_prompts.get(feature, "Answer the following:") + "\n\n" + prompt
+
+        url = "https://api.openai.com/v1/chat/completions"
         headers = {
-            "Authorization": f"Bearer {CHATGPT_API_KEY}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {os.getenv('OPENAI_API_KEY')}"
         }
 
         payload = {
             "model": "gpt-3.5-turbo",
-            "messages": [{"role": "user", "content": prompt}],
-            "temperature": 0.7
+            "messages": [
+                {"role": "system", "content": "You are a helpful English writing assistant."},
+                {"role": "user", "content": full_prompt}
+            ]
         }
 
-        response = requests.post("https://api.openai.com/v1/chat/completions", json=payload, headers=headers)
-        return jsonify(response.json())
+        response = requests.post(url, headers=headers, json=payload)
+        result = response.json()
+
+        # Try to extract the assistant's reply
+        reply = result.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+
+        return jsonify({
+            "original": prompt,
+            "response": reply
+        })
 
     except Exception as e:
-        logging.error(f"ChatGPT API error: {str(e)}")
+        logging.error(f"ChatGPT error: {str(e)}")
         return jsonify({"error": str(e)}), 500
+
 
 @app.route('/gemini', methods=['POST'])
 def gemini():
