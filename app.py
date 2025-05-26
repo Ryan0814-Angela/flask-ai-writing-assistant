@@ -52,7 +52,7 @@ def hash_password(password):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('api_test.html')
 
 @app.route('/api_test')
 def api_test():

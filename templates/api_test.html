@@ -1,104 +1,85 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI API 測試工具</title>
+    <title>Smart English Writing System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <style>
         body {
             background: linear-gradient(to right, #f5f7fa, #c3cfe2);
         }
-    
-        .return-home-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            background-color: #17a2b8;
-            color: white;
-            border: none;
-            border-radius: 30px;
-            padding: 8px 16px;
-            font-weight: bold;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            transition: background-color 0.3s;
-            text-decoration: none;
-        }
-    
-        .return-home-btn:hover {
-            background-color: #138496;
-            color: white;
-        }
-    
         .card {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 30px auto;
             padding: 30px;
             font-size: 1.2rem;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-    
-        h3 {
-            font-size: 1.6rem;
+        h1, h3 {
+            text-align: center;
+        }
+        .feature-buttons .btn {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .output-box {
+            white-space: pre-wrap;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 10px;
+            min-height: 100px;
+            border: 1px solid #ccc;
         }
     </style>
-    
 </head>
 <body class="container mt-4">
 
-    <!-- 返回首頁按鈕 -->
-    <a href="/" class="return-home-btn">🏠 返回首頁</a>
+    <h1 class="text-primary mb-4">Smart English Writing System</h1>
 
-    <h1 class="text-center text-primary mb-4">AI API 測試工具</h1>
+    <!-- Input Area -->
+    <div class="card">
+        <h3 class="text-secondary">Enter your request</h3>
+        <input type="text" id="input_prompt" class="form-control mb-3" placeholder="e.g., Please check grammar in this sentence...">
 
-    <!-- ChatGPT -->
-    <div class="card p-3 mb-4">
-        <h3 class="text-info">ChatGPT</h3>
-        <input type="text" id="chatgpt_prompt" class="form-control mb-2" placeholder="輸入 ChatGPT 提示詞">
-        <button class="btn btn-primary" onclick="sendChatGPT()">發送</button>
-        <pre id="chatgpt_response" class="bg-light p-3 mt-2 rounded"></pre>
+        <!-- Feature Buttons -->
+        <div class="row feature-buttons">
+            <div class="col-md-4">
+                <button class="btn btn-success" onclick="sendToChatGPT('grammar')">Grammar Check and Correction</button>
+                <button class="btn btn-info" onclick="sendToChatGPT('style')">Multi-Version Generation</button>
+            </div>
+            <div class="col-md-4">
+                <button class="btn btn-warning" onclick="sendToChatGPT('image')">Image Description and Translation</button>
+                <button class="btn btn-dark" onclick="sendToChatGPT('history')">User History</button>
+            </div>
+            <div class="col-md-4">
+                <button class="btn btn-secondary" onclick="sendToChatGPT('inspiration')">Generate Writing Inspiration</button>
+                <button class="btn btn-primary" onclick="sendToChatGPT('suggestion')">Writing Suggestions and Explanations</button>
+            </div>
+        </div>
+
+        <!-- Output Area -->
+        <h4 class="mt-4">Output</h4>
+        <div id="output_box" class="output-box"></div>
     </div>
 
-    <!-- Gemini -->
-    <div class="card p-3 mb-4">
-        <h3 class="text-success">Gemini</h3>
-        <input type="text" id="gemini_prompt" class="form-control mb-2" placeholder="輸入 Gemini 提示詞">
-        <button class="btn btn-success" onclick="sendGemini()">發送</button>
-        <pre id="gemini_response" class="bg-light p-3 mt-2 rounded"></pre>
-    </div>
-
-    <!-- JS -->
     <script>
-        function sendChatGPT() {
-            const prompt = document.getElementById("chatgpt_prompt").value;
+        function sendToChatGPT(feature) {
+            const prompt = document.getElementById("input_prompt").value;
             fetch("/chatgpt", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ prompt })
+                body: JSON.stringify({ prompt, feature })
             })
             .then(res => res.json())
             .then(data => {
-                document.getElementById("chatgpt_response").textContent = JSON.stringify(data, null, 2);
-            });
-        }
-
-        function sendGemini() {
-            const prompt = document.getElementById("gemini_prompt").value;
-            fetch("/gemini", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ prompt })
-            })
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById("gemini_response").textContent = JSON.stringify(data, null, 2);
+                document.getElementById("output_box").textContent = JSON.stringify(data, null, 2);
             });
         }
     </script>
 
 </body>
 </html>
+
 
 
