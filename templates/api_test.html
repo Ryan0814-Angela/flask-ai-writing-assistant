@@ -73,32 +73,37 @@
     </div>
 
     <script>
-    function sendToChatGPT(feature) {
-        const prompt = document.getElementById("input_prompt").value;
-        document.getElementById("output_box").textContent = "Loading...";
-        document.getElementById("image_box").innerHTML = "";
-
-        fetch("/chatgpt", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ prompt, feature })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (feature === "image" && data.image_url) {
-                document.getElementById("output_box").textContent = "Prompt: " + data.original;
-                document.getElementById("image_box").innerHTML = `<img src="${data.image_url}" alt="Generated Image">`;
+function sendToChatGPT(feature) {
+    const prompt = document.getElementById("input_prompt").value;
+    fetch("/chatgpt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt, feature })
+    })
+    .then(res => res.json())
+    .then(data => {
+        try {
+            const outputBox = document.getElementById("output_box");
+            if (data.original && data.response) {
+                // 美化對照格式，不顯示引號與 JSON 結構
+                outputBox.innerHTML = `
+                    <b>Original:</b><br>${data.original}<br><br>
+                    <b>Response:</b><br>${data.response}
+                `;
             } else {
-                const original = data.original || "";
-                const response = data.response || JSON.stringify(data, null, 2);
-                document.getElementById("output_box").textContent = `Original:\n${original}\n\nResponse:\n${response}`;
+                // fallback 顯示錯誤訊息
+                outputBox.textContent = data.error || "⚠️ No valid content returned.";
             }
-        })
-        .catch(error => {
-            document.getElementById("output_box").textContent = "⚠️ Request failed: " + error.message;
-        });
-    }
-    </script>
+        } catch (err) {
+            document.getElementById("output_box").textContent = "⚠️ Failed to parse response.";
+        }
+    })
+    .catch(error => {
+        document.getElementById("output_box").textContent = "⚠️ Request failed: " + error.message;
+    });
+}
+</script>
+
 
 </body>
 </html>
