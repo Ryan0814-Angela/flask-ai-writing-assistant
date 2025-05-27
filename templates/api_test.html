@@ -6,31 +6,40 @@
     <title>Smart English Writing System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-            background: linear-gradient(to right, #f5f7fa, #c3cfe2);
-        }
-        .card {
-            max-width: 1000px;
-            margin: 30px auto;
-            padding: 30px;
-            font-size: 1.2rem;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        h1, h3 {
-            text-align: center;
-        }
-        .feature-buttons .btn {
-            width: 100%;
-            margin-bottom: 10px;
-        }
-        .output-box {
-            white-space: pre-wrap;
-            background-color: #f8f9fa;
-            border-radius: 6px;
-            padding: 10px;
-            min-height: 100px;
-            border: 1px solid #ccc;
-        }
+    body {
+        background: linear-gradient(to right, #f5f7fa, #c3cfe2);
+    }
+    .card {
+        max-width: 75vw;
+        margin: 30px auto;
+        padding: 30px;
+        font-size: 1.2rem;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h1, h3 {
+        text-align: center;
+    }
+    .feature-buttons .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    .output-box {
+        white-space: pre-wrap;
+        background-color: #f8f9fa;
+        border-radius: 6px;
+        padding: 10px;
+        min-height: 100px;
+        border: 1px solid #ccc;
+    }
+    .image-preview {
+        text-align: center;
+        margin-top: 20px;
+    }
+    .image-preview img {
+        max-width: 100%;
+        border-radius: 6px;
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+    }
     </style>
 </head>
 <body class="container mt-2">
@@ -60,22 +69,37 @@
         <!-- Output Area -->
         <h4 class="mt-4">Output</h4>
         <div id="output_box" class="output-box"></div>
+        <div id="image_box" class="image-preview"></div>
     </div>
 
     <script>
-        function sendToChatGPT(feature) {
-            const prompt = document.getElementById("input_prompt").value;
-            fetch("/chatgpt", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ prompt, feature })
-            })
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById("output_box").textContent = JSON.stringify(data, null, 2);
-            });
-        }
+    function sendToChatGPT(feature) {
+        const prompt = document.getElementById("input_prompt").value;
+        document.getElementById("output_box").textContent = "Loading...";
+        document.getElementById("image_box").innerHTML = "";
+
+        fetch("/chatgpt", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ prompt, feature })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (feature === "image" && data.image_url) {
+                document.getElementById("output_box").textContent = "Prompt: " + data.original;
+                document.getElementById("image_box").innerHTML = `<img src="${data.image_url}" alt="Generated Image">`;
+            } else {
+                const original = data.original || "";
+                const response = data.response || JSON.stringify(data, null, 2);
+                document.getElementById("output_box").textContent = `Original:\n${original}\n\nResponse:\n${response}`;
+            }
+        })
+        .catch(error => {
+            document.getElementById("output_box").textContent = "⚠️ Request failed: " + error.message;
+        });
+    }
     </script>
 
 </body>
 </html>
+
