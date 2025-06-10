@@ -208,7 +208,10 @@ def chatgpt():
 
         reply = chat_response.choices[0].message.content.strip()
 
-        return jsonify(f"Input: {prompt}\nOutput: {reply}")
+        return jsonify({
+    "original": prompt,
+    "response": reply
+})
 
 
     except Exception as e:
