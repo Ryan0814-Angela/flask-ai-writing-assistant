@@ -82,22 +82,35 @@ function sendToChatGPT(feature) {
     })
     .then(res => res.json())
     .then(data => {
+        const outputBox = document.getElementById("output_box");
+        const imageBox = document.getElementById("image_box");
+
         try {
-            const outputBox = document.getElementById("output_box");
-            if (data.original && data.response) {
-                outputBox.textContent = JSON.stringify(data, null, 2);
+            if (data.image_url) {
+                // 處理圖片輸出
+                outputBox.innerHTML = `<b>Prompt:</b><br>${data.original}`;
+                imageBox.innerHTML = `<img src="${data.image_url}" alt="Generated Image">`;
+            } else if (data.original && data.response) {
+                // 處理一般文字功能輸出
+                outputBox.innerHTML = `<b>Original:</b><br>${data.original}<br><br><b>Response:</b><br>${data.response}`;
+                imageBox.innerHTML = ""; // 清空圖片區域
             } else {
+                // 處理錯誤訊息
                 outputBox.textContent = data.error || "⚠️ No valid content returned.";
+                imageBox.innerHTML = "";
             }
         } catch (err) {
-            document.getElementById("output_box").textContent = "⚠️ Failed to parse response.";
+            outputBox.textContent = "⚠️ Failed to parse response.";
+            imageBox.innerHTML = "";
         }
     })
     .catch(error => {
         document.getElementById("output_box").textContent = "⚠️ Request failed: " + error.message;
+        document.getElementById("image_box").innerHTML = "";
     });
 }
 </script>
+
 
 
 
