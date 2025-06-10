@@ -162,7 +162,7 @@ def proxy_request():
         logging.error(f"Proxy error: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
-import openai  # 確保有安裝 openai 套件
+import openai  
 
 @app.route('/chatgpt', methods=['POST'])
 def chatgpt():
@@ -174,9 +174,9 @@ def chatgpt():
         if not prompt:
             return jsonify({"error": "Please provide a prompt"}), 400
 
-        # 特別處理圖像功能
+        
         if feature == "image":
-            # 使用 OpenAI DALL·E 模型產生圖片
+            
             response = openai.Image.create(
                 prompt=prompt,
                 n=1,
@@ -188,7 +188,7 @@ def chatgpt():
                 "original": prompt
             })
 
-        # 文字處理類功能
+        
         feature_prompts = {
             "grammar": "Please correct the grammar in the following text:",
             "style": "Rewrite the following sentence in three different writing styles:",
@@ -208,54 +208,13 @@ def chatgpt():
 
         reply = chat_response.choices[0].message.content.strip()
 
-        return jsonify({
-            "original": prompt,
-            "response": reply
-        })
+        return jsonify(f"Input: {prompt}\nOutput: {reply}")
+
 
     except Exception as e:
         logging.error(f"ChatGPT API error: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
-
-
-@app.route('/gemini', methods=['POST'])
-def gemini():
-    try:
-        data = request.json
-        prompt = data.get("prompt", "").strip()
-
-        if not prompt:
-            return jsonify({"error": "Please provide prompt"}), 400
-
-        url = f"https://generativelanguage.googleapis.com/v1beta1/models/gemini-pro:generateContent?key={GEMINI_API_KEY}"
-
-        payload = {
-            "contents": [
-                {
-                    "role": "user",  # ← 這一行不能少
-                    "parts": [{"text": prompt}]
-                }
-            ]
-        }
-
-        headers = {
-            "Content-Type": "application/json"
-        }
-
-        response = requests.post(url, json=payload, headers=headers)
-
-        try:
-            return jsonify(response.json())
-        except ValueError:
-            return jsonify({
-                "error": "Invalid JSON from Gemini API",
-                "raw": response.text
-            }), 500
-
-    except Exception as e:
-        logging.error(f"Gemini API error: {str(e)}")
-        return jsonify({"error": str(e)}), 500
 
 
 
