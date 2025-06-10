@@ -49,6 +49,16 @@
     <!-- Input Area -->
     <div class="card">
         <h3 class="text-secondary">Enter your request</h3>
+        <label for="example_select" class="form-label">Try a sample:</label>
+<select id="example_select" class="form-select mb-3" onchange="fillExample()">
+    <option value="">-- Select an example --</option>
+    <option value="She go to the market every Sundays and buy many fruits.">📝 Grammar Check</option>
+    <option value="Rewrite this: Technology has changed communication a lot.">🧢 Multi-Version Style</option>
+    <option value="A panda surfing on the waves during sunset.">🎨 Image Description</option>
+    <option value="It was a dark and stormy night.">💡 Writing Inspiration</option>
+    <option value="The sentence is: He very fast run in the street.">🔍 Writing Suggestion</option>
+</select>
+
         <input type="text" id="input_prompt" class="form-control mb-3" placeholder="e.g., Please check grammar in this sentence...">
 
         <!-- Feature Buttons -->
@@ -108,6 +118,10 @@ function sendToChatGPT(feature) {
         document.getElementById("output_box").textContent = "⚠️ Request failed: " + error.message;
         document.getElementById("image_box").innerHTML = "";
     });
+}
+function fillExample() {
+    const selected = document.getElementById("example_select").value;
+    document.getElementById("input_prompt").value = selected;
 }
 </script>
 
